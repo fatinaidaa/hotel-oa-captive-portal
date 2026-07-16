@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HOTEL OA WiFi</title>
+  <link rel="stylesheet" href="./style.css">
+  <script src="./config.js"></script>
+</head>
+<body>
+  <main class="card">
+    <div class="brand">HOTEL OA</div>
+    <h1>Guest WiFi Access</h1>
+    <p class="subtitle">Enter your room details to connect.</p>
+
+    <section id="deviceInfo" class="device-box hidden"></section>
+
+    <form id="loginForm">
+      <input id="roomInput" type="text" name="room" placeholder="Room Number" required>
+      <input id="passwordInput" type="password" name="password" placeholder="WiFi Password" required>
+      <button type="submit">Connect to WiFi</button>
+    </form>
+
+    <section id="messageBox" class="message hidden"></section>
+
+    <section id="statusBox" class="status hidden">
+      <div id="statusIcon" class="status-icon">OK</div>
+      <h2 id="statusTitle">Access Granted</h2>
+      <p id="statusText">Your connection has been verified successfully.</p>
+      <button id="continueButton" class="continue hidden" type="button">
+        Continue to Internet
+      </button>
+    </section>
+
+    <section id="requestPanel" class="request hidden">
+      <h2>Device Limit Exceeded</h2>
+      <p>
+        This room has reached the maximum device connections. Enter your phone
+        number to request additional access.
+      </p>
+      <form id="requestForm">
+        <input id="phoneInput" type="tel" name="phone" placeholder="+60123456789" required>
+        <button type="submit">Request Additional Access</button>
+      </form>
+    </section>
+
+    <footer>
+      Hotel network access is monitored for service quality and fair usage.
+    </footer>
+  </main>
+
+  <script src="./script.js"></script>
+</body>
+</html>

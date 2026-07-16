@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: hotel-oa-captive-portal
+    env: static
+    buildCommand: ""
+    staticPublishPath: .
