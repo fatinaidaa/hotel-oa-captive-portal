@@ -3,201 +3,398 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Hotel OA Level 2 Dashboard</title>
+  <title>Hotel OA Network Monitor</title>
   <style>
     * { box-sizing: border-box; }
     body {
       margin: 0;
-      font-family: Arial, Helvetica, sans-serif;
-      background: #f5f7fb;
-      color: #102033;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #f9fafb;
+      color: #111827;
     }
-    header {
-      padding: 24px 32px;
-      background: linear-gradient(135deg, #1e3c72, #2a5298);
-      color: white;
-    }
-    header h1 { margin: 0 0 6px; }
-    header p { margin: 0; opacity: .85; }
-    main { padding: 24px 32px 48px; }
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 16px;
-      margin-bottom: 22px;
-    }
-    .card {
-      background: white;
-      border: 1px solid #e6edf5;
-      border-radius: 18px;
-      padding: 20px;
-      box-shadow: 0 8px 22px rgba(15, 23, 42, .06);
-    }
-    .metric-label {
-      color: #8a97aa;
-      font-size: 13px;
-      margin-bottom: 8px;
-    }
-    .metric-value {
-      font-size: 30px;
-      font-weight: 800;
-      color: #125da8;
-    }
-    section { margin-top: 22px; }
-    h2 { margin: 0 0 14px; }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      overflow: hidden;
-      border-radius: 16px;
-      background: white;
-      box-shadow: 0 8px 22px rgba(15, 23, 42, .06);
-    }
-    th, td {
-      padding: 14px 16px;
-      border-bottom: 1px solid #edf2f7;
-      text-align: left;
-      vertical-align: top;
-    }
-    th {
-      color: #8a97aa;
-      font-size: 13px;
-      text-transform: uppercase;
-      background: #fbfdff;
-    }
-    tr:last-child td { border-bottom: 0; }
-    .badge {
-      display: inline-flex;
-      padding: 6px 10px;
-      border-radius: 999px;
-      font-size: 13px;
-      font-weight: 700;
-      background: #edf2f7;
-      color: #53657d;
-    }
-    .good { background: #dcfce7; color: #15803d; }
-    .warn { background: #fef3c7; color: #b45309; }
-    .bad { background: #fee2e2; color: #b91c1c; }
-    .actions {
+    .app { min-height: 100vh; display: flex; }
+    .sidebar {
+      width: 224px;
+      background: #fff;
+      border-right: 1px solid #f3f4f6;
       display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
+      flex-direction: column;
+      flex-shrink: 0;
     }
-    button {
-      border: 0;
+    .brand {
+      padding: 16px;
+      border-bottom: 1px solid #f3f4f6;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .brand-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 9px;
+      background: #2563eb;
+      color: #fff;
+      display: grid;
+      place-items: center;
+      font-size: 16px;
+    }
+    .brand-title {
+      font-size: 14px;
+      line-height: 1.1;
+      font-weight: 650;
+      color: #1f2937;
+      margin: 0;
+    }
+    .brand-subtitle {
+      font-size: 12px;
+      color: #9ca3af;
+      margin: 2px 0 0;
+    }
+    .nav {
+      flex: 1;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .nav a {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 9px;
+      text-decoration: none;
+      color: #6b7280;
+      font-size: 14px;
+    }
+    .nav a.active {
+      background: #eff6ff;
+      color: #2563eb;
+      font-weight: 600;
+    }
+    .user-box {
+      padding: 12px;
+      border-top: 1px solid #f3f4f6;
+    }
+    .user-card {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #f9fafb;
       border-radius: 10px;
       padding: 10px 12px;
-      font-weight: 800;
-      cursor: pointer;
+      margin-bottom: 6px;
     }
-    .allow { background: #dcfce7; color: #15803d; }
-    .reject { background: #fee2e2; color: #b91c1c; }
-    .reset { background: #e0efff; color: #125da8; }
-    .toolbar {
+    .avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 999px;
+      background: #dbeafe;
+      color: #2563eb;
+      display: grid;
+      place-items: center;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .logout {
+      color: #6b7280;
+      font-size: 14px;
+      padding: 9px 12px;
+    }
+    main {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px;
+    }
+    .page-header {
+      margin-bottom: 24px;
+    }
+    h1 {
+      font-size: 24px;
+      margin: 0 0 8px;
+      font-weight: 650;
+    }
+    .subtitle {
+      margin: 0;
+      color: #9ca3af;
+      font-size: 15px;
+    }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .card {
+      background: #fff;
+      border: 1px solid #f3f4f6;
+      border-radius: 14px;
+      box-shadow: 0 1px 3px rgba(15, 23, 42, .04);
+    }
+    .stat-card {
+      padding: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      min-height: 104px;
+    }
+    .label {
+      font-size: 12px;
+      color: #9ca3af;
+      margin-bottom: 7px;
+    }
+    .value {
+      font-size: 24px;
+      font-weight: 650;
+      color: #1f2937;
+    }
+    .sub {
+      font-size: 12px;
+      color: #9ca3af;
+      margin-top: 7px;
+    }
+    .stat-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: grid;
+      place-items: center;
+      font-size: 16px;
+    }
+    .blue { background: #eff6ff; color: #2563eb; }
+    .green { background: #ecfdf5; color: #16a34a; }
+    .red { background: #fef2f2; color: #ef4444; }
+    .amber { background: #fffbeb; color: #f59e0b; }
+    .section { margin-bottom: 18px; }
+    .section-head {
+      padding: 14px 16px;
+      border-bottom: 1px solid #f3f4f6;
       display: flex;
       justify-content: space-between;
       align-items: center;
       gap: 12px;
-      flex-wrap: wrap;
-      margin-bottom: 16px;
     }
-    .muted { color: #8a97aa; font-size: 13px; }
-    .mono { font-family: Consolas, monospace; font-size: 13px; }
-    @media (max-width: 720px) {
-      main, header { padding-left: 16px; padding-right: 16px; }
+    .section-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #374151;
+      margin: 0;
+    }
+    .section-link {
+      color: #2563eb;
+      font-size: 12px;
+      text-decoration: none;
+      cursor: pointer;
+      border: 0;
+      background: transparent;
+    }
+    .room-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 1px;
+      background: #f3f4f6;
+    }
+    .room-cell {
+      background: #fff;
+      padding: 18px 12px;
+      text-align: center;
+    }
+    .room-id {
+      font-size: 16px;
+      font-weight: 650;
+      margin: 4px 0;
+    }
+    .dot {
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      margin-right: 5px;
+      vertical-align: middle;
+    }
+    .dot-green { background: #4ade80; }
+    .dot-amber { background: #fbbf24; }
+    .dot-gray { background: #d1d5db; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    th, td {
+      padding: 14px 16px;
+      border-bottom: 1px solid #f9fafb;
+      text-align: left;
+      vertical-align: top;
+      font-size: 14px;
+    }
+    th {
+      color: #9ca3af;
+      font-size: 12px;
+      text-transform: uppercase;
+      font-weight: 650;
+      background: #fcfcfd;
+    }
+    tr:last-child td { border-bottom: 0; }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 5px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+      background: #f3f4f6;
+      color: #6b7280;
+    }
+    .badge.good { background: #ecfdf5; color: #16a34a; }
+    .badge.warn { background: #fffbeb; color: #d97706; }
+    .badge.bad { background: #fef2f2; color: #dc2626; }
+    .muted { color: #9ca3af; font-size: 12px; }
+    .mono { font-family: Consolas, "Courier New", monospace; font-size: 12px; color: #64748b; }
+    .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    button {
+      border: 1px solid transparent;
+      border-radius: 9px;
+      padding: 8px 12px;
+      font-weight: 600;
+      cursor: pointer;
+      background: #fff;
+      font-size: 13px;
+    }
+    .btn-allow { background: #ecfdf5; color: #16a34a; border-color: #dcfce7; }
+    .btn-reject { background: #fef2f2; color: #ef4444; border-color: #fee2e2; }
+    .btn-soft { background: #fff; color: #374151; border-color: #e5e7eb; }
+    .stack { display: grid; gap: 4px; }
+    @media (max-width: 900px) {
+      .sidebar { width: 76px; }
+      .brand div:last-child, .nav span, .user-card div:last-child, .logout span { display: none; }
+      .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .room-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 640px) {
+      main { padding: 16px; }
+      .stats { grid-template-columns: 1fr; }
       table { display: block; overflow-x: auto; white-space: nowrap; }
     }
   </style>
 </head>
 <body>
-  <header>
-    <h1>Hotel OA Level 2 Dashboard</h1>
-    <p>OpenWrt gateway + room access control + AI suggestion prototype</p>
-  </header>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-icon">⌁</div>
+        <div>
+          <p class="brand-title">Hotel OA Network Monitor</p>
+          <p class="brand-subtitle">Staff Portal</p>
+        </div>
+      </div>
+      <nav class="nav">
+        <a class="active" href="#dashboard"><span>▦</span><span>Dashboard</span></a>
+        <a href="#rooms"><span>▦</span><span>Room Status</span></a>
+        <a href="#network"><span>◉</span><span>Network Monitor</span></a>
+        <a href="#users"><span>♙</span><span>Connected Users</span></a>
+        <a href="#requests"><span>♢</span><span>Requests</span></a>
+      </nav>
+      <div class="user-box">
+        <div class="user-card">
+          <div class="avatar">S</div>
+          <div>
+            <div style="font-size:12px;font-weight:650;color:#374151">Staff</div>
+            <div class="muted">123</div>
+          </div>
+        </div>
+        <div class="logout"><span>↳ Logout</span></div>
+      </div>
+    </aside>
 
-  <main>
-    <div class="toolbar">
-      <div>
-        <strong>Staff Portal</strong>
-        <div class="muted">Demo backend runs with local JSON storage.</div>
+    <main>
+      <div class="page-header">
+        <h1>Dashboard</h1>
+        <p class="subtitle">Distributed hotel network overview</p>
       </div>
-      <div class="actions">
-        <button class="reset" onclick="loadAll()">Refresh</button>
-        <button class="reset" onclick="resetDemo()">Reset Demo</button>
-      </div>
-    </div>
 
-    <div class="grid">
-      <div class="card">
-        <div class="metric-label">Total Rooms</div>
-        <div id="totalRooms" class="metric-value">0</div>
+      <div class="stats">
+        <div class="card stat-card">
+          <div>
+            <div class="label">Total Rooms</div>
+            <div id="totalRooms" class="value">0</div>
+            <div id="fullRooms" class="sub">0 full</div>
+          </div>
+          <div class="stat-icon blue">◉</div>
+        </div>
+        <div class="card stat-card">
+          <div>
+            <div class="label">Connected Devices</div>
+            <div id="connectedDevices" class="value">0</div>
+            <div class="sub">Active now</div>
+          </div>
+          <div class="stat-icon green">♙</div>
+        </div>
+        <div class="card stat-card">
+          <div>
+            <div class="label">Pending Requests</div>
+            <div id="pendingRequests" class="value">0</div>
+            <div class="sub">Awaiting approval</div>
+          </div>
+          <div class="stat-icon red">♢</div>
+        </div>
+        <div class="card stat-card">
+          <div>
+            <div class="label">Active Sessions</div>
+            <div id="activeSessions" class="value">0</div>
+            <div class="sub">Current sessions</div>
+          </div>
+          <div class="stat-icon amber">≋</div>
+        </div>
       </div>
-      <div class="card">
-        <div class="metric-label">Connected Devices</div>
-        <div id="connectedDevices" class="metric-value">0</div>
-      </div>
-      <div class="card">
-        <div class="metric-label">Pending Requests</div>
-        <div id="pendingRequests" class="metric-value">0</div>
-      </div>
-      <div class="card">
-        <div class="metric-label">Active Sessions</div>
-        <div id="activeSessions" class="metric-value">0</div>
-      </div>
-    </div>
 
-    <section>
-      <h2>Room Status</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>Room</th>
-            <th>Connected / Limit</th>
-            <th>Password</th>
-            <th>Signal</th>
-            <th>WiFi Latency</th>
-            <th>Packet Loss</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody id="roomsTable"></tbody>
-      </table>
-    </section>
+      <section id="rooms" class="card section">
+        <div class="section-head">
+          <h2 class="section-title">Room Status</h2>
+          <button class="section-link" onclick="loadAll()">Refresh →</button>
+        </div>
+        <div id="roomGrid" class="room-grid"></div>
+      </section>
 
-    <section>
-      <h2>Additional Device Requests</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>Room</th>
-            <th>Guest</th>
-            <th>MAC Address</th>
-            <th>AI Suggestion</th>
-            <th>Status</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody id="requestsTable"></tbody>
-      </table>
-    </section>
+      <section id="requests" class="card section">
+        <div class="section-head">
+          <h2 class="section-title">Pending Requests</h2>
+          <span id="requestPill" class="badge warn">0 Pending</span>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Guest</th>
+              <th>Room</th>
+              <th>MAC Address</th>
+              <th>AI Suggestion</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="requestsTable"></tbody>
+        </table>
+      </section>
 
-    <section>
-      <h2>Connected Users</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>Room</th>
-            <th>MAC Address</th>
-            <th>IP Address</th>
-            <th>Login Time</th>
-            <th>Duration</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody id="sessionsTable"></tbody>
-      </table>
-    </section>
-  </main>
+      <section id="users" class="card section">
+        <div class="section-head">
+          <h2 class="section-title">Connected Users</h2>
+          <span class="muted">Monitor currently connected devices</span>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Room</th>
+              <th>MAC Address</th>
+              <th>IP Address</th>
+              <th>Login Time</th>
+              <th>Duration</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="sessionsTable"></tbody>
+        </table>
+      </section>
+    </main>
+  </div>
 
   <script>
     const fmtTime = (value) =>
@@ -238,26 +435,22 @@
       connectedDevices.textContent = summary.connected_devices
       pendingRequests.textContent = summary.pending_requests
       activeSessions.textContent = summary.active_sessions
+      fullRooms.textContent = `${rooms.filter(room => Number(room.connected) >= Number(room.device_limit)).length} full`
+      requestPill.textContent = `${summary.pending_requests} Pending`
 
-      roomsTable.innerHTML = rooms.map((room) => {
-        const metric = room.metric || {}
-        const signalType =
-          metric.signal_status === 'Excellent' || metric.signal_status === 'Good'
-            ? 'good'
-            : metric.signal_status === 'Fair'
-              ? 'warn'
-              : 'bad'
+      roomGrid.innerHTML = rooms.map((room) => {
+        const connected = Number(room.connected)
+        const limit = Number(room.device_limit)
+        const dotClass = connected >= limit ? 'dot-amber' : connected > 0 ? 'dot-green' : 'dot-gray'
 
         return `
-          <tr>
-            <td><strong>Room ${room.room_id}</strong></td>
-            <td>${room.connected} / ${room.device_limit}</td>
-            <td class="mono">${room.wifi_password}</td>
-            <td>${metric.rssi ?? '-'} dBm ${badge(metric.signal_status || 'No Data', signalType)}</td>
-            <td>${metric.wifi_latency_ms ?? '-'} ms</td>
-            <td>${metric.wifi_packet_loss ?? '-'}%</td>
-            <td>${badge(room.status, room.status === 'Full' ? 'bad' : room.status === 'Empty' ? '' : 'good')}</td>
-          </tr>
+          <div class="room-cell">
+            <div class="label">Room</div>
+            <div class="room-id">${room.room_id}</div>
+            <div class="muted">
+              <span class="dot ${dotClass}"></span>${connected}/${limit}
+            </div>
+          </div>
         `
       }).join('')
 
@@ -269,26 +462,31 @@
 
             return `
               <tr>
+                <td>
+                  <div class="stack">
+                    <strong>${item.phone_number || '-'}</strong>
+                    <span class="muted">${fmtTime(item.created_at)}</span>
+                  </div>
+                </td>
                 <td><strong>Room ${item.room_id}</strong></td>
-                <td>${item.phone_number || '-'}</td>
                 <td class="mono">${item.mac_address}</td>
                 <td>
                   ${badge(decision, decisionType)}
-                  <div class="muted">${suggestion.message || '-'}</div>
+                  <div class="muted" style="margin-top:6px;max-width:360px">${suggestion.message || '-'}</div>
                 </td>
                 <td>${badge(item.status, item.status === 'approved' ? 'good' : item.status === 'rejected' ? 'bad' : 'warn')}</td>
                 <td>
                   ${item.status === 'pending' ? `
                     <div class="actions">
-                      <button class="allow" onclick="decide('${item.id}', 'allow')">Allow</button>
-                      <button class="reject" onclick="decide('${item.id}', 'reject')">Reject</button>
+                      <button class="btn-allow" onclick="decide('${item.id}', 'allow')">✓ Allow</button>
+                      <button class="btn-reject" onclick="decide('${item.id}', 'reject')">× Reject</button>
                     </div>
                   ` : '-'}
                 </td>
               </tr>
             `
           }).join('')
-        : '<tr><td colspan="6" class="muted">No requests yet.</td></tr>'
+        : '<tr><td colspan="6" class="muted">No pending requests.</td></tr>'
 
       sessionsTable.innerHTML = sessions.length
         ? sessions.map((session) => `
@@ -298,7 +496,7 @@
             <td>${session.ip_address || '-'}</td>
             <td>${fmtTime(session.login_time)}</td>
             <td>${fmtDuration(session.duration_seconds)}</td>
-            <td><button class="reject" onclick="disconnect('${encodeURIComponent(session.mac_address)}')">Disconnect</button></td>
+            <td><button class="btn-reject" onclick="disconnect('${encodeURIComponent(session.mac_address)}')">Disconnect</button></td>
           </tr>
         `).join('')
         : '<tr><td colspan="6" class="muted">No active sessions.</td></tr>'
@@ -314,11 +512,6 @@
 
     const disconnect = async (mac) => {
       await request(`/api/sessions/${mac}`, { method: 'DELETE' })
-      await loadAll()
-    }
-
-    const resetDemo = async () => {
-      await request('/api/reset-demo', { method: 'POST' })
       await loadAll()
     }
 
