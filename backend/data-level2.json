@@ -1,0 +1,44 @@
+{
+  "rooms": [
+    {
+      "id": "101",
+      "password": "OA101",
+      "device_limit": 1,
+      "default_device_limit": 1,
+      "check_in": "2026-07-16",
+      "check_out": "2026-07-20"
+    },
+    {
+      "id": "102",
+      "password": "OA102",
+      "device_limit": 2,
+      "default_device_limit": 2,
+      "check_in": "2026-07-16",
+      "check_out": "2026-07-20"
+    }
+  ],
+  "sessions": [],
+  "requests": [],
+  "metrics": [
+    {
+      "room_id": "101",
+      "node_id": "child_101",
+      "rssi": -48,
+      "wifi_latency_ms": 8,
+      "wifi_jitter_ms": 4,
+      "wifi_packet_loss": 0,
+      "wifi_success_rate": 100,
+      "updated_at": "2026-07-16T22:03:48.755Z"
+    },
+    {
+      "room_id": "102",
+      "node_id": "child_102",
+      "rssi": -55,
+      "wifi_latency_ms": 12,
+      "wifi_jitter_ms": 6,
+      "wifi_packet_loss": 0,
+      "wifi_success_rate": 100,
+      "updated_at": "2026-07-16T22:03:48.755Z"
+    }
+  ]
+}

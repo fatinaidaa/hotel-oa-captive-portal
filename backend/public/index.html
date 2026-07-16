@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Hotel OA Level 2 Dashboard</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f5f7fb;
+      color: #102033;
+    }
+    header {
+      padding: 24px 32px;
+      background: linear-gradient(135deg, #1e3c72, #2a5298);
+      color: white;
+    }
+    header h1 { margin: 0 0 6px; }
+    header p { margin: 0; opacity: .85; }
+    main { padding: 24px 32px 48px; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-bottom: 22px;
+    }
+    .card {
+      background: white;
+      border: 1px solid #e6edf5;
+      border-radius: 18px;
+      padding: 20px;
+      box-shadow: 0 8px 22px rgba(15, 23, 42, .06);
+    }
+    .metric-label {
+      color: #8a97aa;
+      font-size: 13px;
+      margin-bottom: 8px;
+    }
+    .metric-value {
+      font-size: 30px;
+      font-weight: 800;
+      color: #125da8;
+    }
+    section { margin-top: 22px; }
+    h2 { margin: 0 0 14px; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      overflow: hidden;
+      border-radius: 16px;
+      background: white;
+      box-shadow: 0 8px 22px rgba(15, 23, 42, .06);
+    }
+    th, td {
+      padding: 14px 16px;
+      border-bottom: 1px solid #edf2f7;
+      text-align: left;
+      vertical-align: top;
+    }
+    th {
+      color: #8a97aa;
+      font-size: 13px;
+      text-transform: uppercase;
+      background: #fbfdff;
+    }
+    tr:last-child td { border-bottom: 0; }
+    .badge {
+      display: inline-flex;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 700;
+      background: #edf2f7;
+      color: #53657d;
+    }
+    .good { background: #dcfce7; color: #15803d; }
+    .warn { background: #fef3c7; color: #b45309; }
+    .bad { background: #fee2e2; color: #b91c1c; }
+    .actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    button {
+      border: 0;
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    .allow { background: #dcfce7; color: #15803d; }
+    .reject { background: #fee2e2; color: #b91c1c; }
+    .reset { background: #e0efff; color: #125da8; }
+    .toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+    .muted { color: #8a97aa; font-size: 13px; }
+    .mono { font-family: Consolas, monospace; font-size: 13px; }
+    @media (max-width: 720px) {
+      main, header { padding-left: 16px; padding-right: 16px; }
+      table { display: block; overflow-x: auto; white-space: nowrap; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Hotel OA Level 2 Dashboard</h1>
+    <p>OpenWrt gateway + room access control + AI suggestion prototype</p>
+  </header>
+
+  <main>
+    <div class="toolbar">
+      <div>
+        <strong>Staff Portal</strong>
+        <div class="muted">Demo backend runs with local JSON storage.</div>
+      </div>
+      <div class="actions">
+        <button class="reset" onclick="loadAll()">Refresh</button>
+        <button class="reset" onclick="resetDemo()">Reset Demo</button>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <div class="metric-label">Total Rooms</div>
+        <div id="totalRooms" class="metric-value">0</div>
+      </div>
+      <div class="card">
+        <div class="metric-label">Connected Devices</div>
+        <div id="connectedDevices" class="metric-value">0</div>
+      </div>
+      <div class="card">
+        <div class="metric-label">Pending Requests</div>
+        <div id="pendingRequests" class="metric-value">0</div>
+      </div>
+      <div class="card">
+        <div class="metric-label">Active Sessions</div>
+        <div id="activeSessions" class="metric-value">0</div>
+      </div>
+    </div>
+
+    <section>
+      <h2>Room Status</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Room</th>
+            <th>Connected / Limit</th>
+            <th>Password</th>
+            <th>Signal</th>
+            <th>WiFi Latency</th>
+            <th>Packet Loss</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="roomsTable"></tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>Additional Device Requests</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Room</th>
+            <th>Guest</th>
+            <th>MAC Address</th>
+            <th>AI Suggestion</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="requestsTable"></tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>Connected Users</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Room</th>
+            <th>MAC Address</th>
+            <th>IP Address</th>
+            <th>Login Time</th>
+            <th>Duration</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="sessionsTable"></tbody>
+      </table>
+    </section>
+  </main>
+
+  <script>
+    const fmtTime = (value) =>
+      new Date(value).toLocaleString('en-MY', {
+        timeZone: 'Asia/Kuala_Lumpur',
+        hour12: true
+      })
+
+    const fmtDuration = (seconds) => {
+      const h = Math.floor(seconds / 3600)
+      const m = Math.floor((seconds % 3600) / 60)
+      const s = seconds % 60
+      return h > 0 ? `${h}h ${m}m ${s}s` : `${m}m ${s}s`
+    }
+
+    const badge = (text, type = '') =>
+      `<span class="badge ${type}">${text}</span>`
+
+    const request = async (path, options = {}) => {
+      const response = await fetch(path, {
+        headers: { 'Content-Type': 'application/json' },
+        ...options
+      })
+
+      if (!response.ok) throw new Error(await response.text())
+      return response.json()
+    }
+
+    const loadAll = async () => {
+      const [summary, rooms, requests, sessions] = await Promise.all([
+        request('/api/summary'),
+        request('/api/rooms'),
+        request('/api/requests'),
+        request('/api/sessions/active')
+      ])
+
+      totalRooms.textContent = summary.total_rooms
+      connectedDevices.textContent = summary.connected_devices
+      pendingRequests.textContent = summary.pending_requests
+      activeSessions.textContent = summary.active_sessions
+
+      roomsTable.innerHTML = rooms.map((room) => {
+        const metric = room.metric || {}
+        const signalType =
+          metric.signal_status === 'Excellent' || metric.signal_status === 'Good'
+            ? 'good'
+            : metric.signal_status === 'Fair'
+              ? 'warn'
+              : 'bad'
+
+        return `
+          <tr>
+            <td><strong>Room ${room.room_id}</strong></td>
+            <td>${room.connected} / ${room.device_limit}</td>
+            <td class="mono">${room.wifi_password}</td>
+            <td>${metric.rssi ?? '-'} dBm ${badge(metric.signal_status || 'No Data', signalType)}</td>
+            <td>${metric.wifi_latency_ms ?? '-'} ms</td>
+            <td>${metric.wifi_packet_loss ?? '-'}%</td>
+            <td>${badge(room.status, room.status === 'Full' ? 'bad' : room.status === 'Empty' ? '' : 'good')}</td>
+          </tr>
+        `
+      }).join('')
+
+      requestsTable.innerHTML = requests.length
+        ? requests.map((item) => {
+            const suggestion = item.ai_suggestion || {}
+            const decision = suggestion.decision || '-'
+            const decisionType = decision.includes('REJECT') ? 'bad' : decision.includes('CAUTION') ? 'warn' : 'good'
+
+            return `
+              <tr>
+                <td><strong>Room ${item.room_id}</strong></td>
+                <td>${item.phone_number || '-'}</td>
+                <td class="mono">${item.mac_address}</td>
+                <td>
+                  ${badge(decision, decisionType)}
+                  <div class="muted">${suggestion.message || '-'}</div>
+                </td>
+                <td>${badge(item.status, item.status === 'approved' ? 'good' : item.status === 'rejected' ? 'bad' : 'warn')}</td>
+                <td>
+                  ${item.status === 'pending' ? `
+                    <div class="actions">
+                      <button class="allow" onclick="decide('${item.id}', 'allow')">Allow</button>
+                      <button class="reject" onclick="decide('${item.id}', 'reject')">Reject</button>
+                    </div>
+                  ` : '-'}
+                </td>
+              </tr>
+            `
+          }).join('')
+        : '<tr><td colspan="6" class="muted">No requests yet.</td></tr>'
+
+      sessionsTable.innerHTML = sessions.length
+        ? sessions.map((session) => `
+          <tr>
+            <td><strong>Room ${session.room_id}</strong></td>
+            <td class="mono">${session.mac_address}</td>
+            <td>${session.ip_address || '-'}</td>
+            <td>${fmtTime(session.login_time)}</td>
+            <td>${fmtDuration(session.duration_seconds)}</td>
+            <td><button class="reject" onclick="disconnect('${encodeURIComponent(session.mac_address)}')">Disconnect</button></td>
+          </tr>
+        `).join('')
+        : '<tr><td colspan="6" class="muted">No active sessions.</td></tr>'
+    }
+
+    const decide = async (id, action) => {
+      await request(`/api/requests/${id}/action`, {
+        method: 'POST',
+        body: JSON.stringify({ action })
+      })
+      await loadAll()
+    }
+
+    const disconnect = async (mac) => {
+      await request(`/api/sessions/${mac}`, { method: 'DELETE' })
+      await loadAll()
+    }
+
+    const resetDemo = async () => {
+      await request('/api/reset-demo', { method: 'POST' })
+      await loadAll()
+    }
+
+    loadAll()
+    setInterval(loadAll, 5000)
+  </script>
+</body>
+</html>
